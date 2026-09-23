@@ -12,6 +12,10 @@ location = st.text_input("Where is the broken road?",
     )
 years_broken = st.number_input("How many years has it been like this?", min_value=0, max_value=20, step=1)
 description = st.text_area("Describe the condition (e.g., deep potholes, waterlogging)") 
+st.write("Add GPS Coordinates for Map Tracking*")
+latitude = st.number_input("Latitude", value=12.2958, format="%.4f")
+longitude = st.number_input("Longitude", value=76.6394, format="%.4f")
+
 submit_button = st.button("Submit Report")
 
 CSV_FILE = "complaints.csv"
@@ -21,8 +25,7 @@ if submit_button:
         with st.spinner("Looking up map coordinates..."):
             try:
                 # Background trick: search the location text to find coordinates
-                search_location = f"{location},Mysore, Karnataka, India"
-                geo_data = geolocator.geocode(search_location, timeout=10)
+                geo_data = geolocator.geocode(location, timeout=10)
                 
                 if geo_data:
                     latitude = geo_data.latitude
