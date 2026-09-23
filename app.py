@@ -12,7 +12,29 @@ location = st.text_input("Where is the broken road?",
     placeholder="e.g., Gokulam 3rd stage, or MG Road"
     )
 years_broken = st.number_input("How many years has it been like this?", min_value=0, max_value=20, step=1)
+issue_category = st.selectbox(
+    "What type of road problem is this?",
+    [
+        "Potholes",
+        "Road Cracks",
+        "Waterlogging",
+        "Damaged Pavement",
+        "Open Manhole",
+        "Drainage Problem",
+        "Construction Debris",
+        "Other"
+    ]
+)
 description = st.text_area("Describe the condition (e.g., deep potholes, waterlogging)") 
+severity = st.selectbox(
+    "How serious is the problem?",
+    [
+        "Low",
+        "Medium",
+        "High",
+        "Critical"
+    ]
+)
 submit_button = st.button("Submit Report")
 
 CSV_FILE = "complaints.csv"
@@ -33,7 +55,9 @@ if submit_button:
                         report_id: [report_id],
                         "location": [location],
                         "years_broken": [years_broken],
+                        "issue_category": [issue_category],
                         "description": [description],
+                        "severity": [severity],
                         "latitude": [latitude],
                         "longitude": [longitude],
                         "date_reported": [datetime.now().strftime('%Y-%m-%d')],
