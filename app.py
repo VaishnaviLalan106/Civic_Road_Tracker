@@ -79,12 +79,27 @@ if submit_button:
 if os.path.isfile(CSV_FILE):
     st.subheader("Unresolved Reports Dashboard")
     all_reports = pd.read_csv(CSV_FILE)
-    col1, col2 = st.columns([1, 1])
+    total_reports = len(all_reports)
+    pending_reports=(all_reports['status']=="Pending").sum()
+    high_priority_reports=all_reports["severity"].isin(
+    ["High", "Critical"]).sum()
+    resolved_reports = (all_reports["status"] == "Resolved").sum()
+    st.subheader("Report Summary")
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.write("**Live Hazard Map**")
-        st.map(all_reports)
+        st.metric("Total Reports", total_reports)
     with col2:
-        st.write("**Report Log Table**")
-        st.dataframe(all_reports, use_container_width=True)  
-    st.dataframe(all_reports)
+        st.metric("Pending Reports", pending_reports)
+    with col3:
+        st.metric("High Priority Reports", high_priority_reports)
+    with col4:
+        st.metric("Resolved Reports", resolved_reports)
+    st.subheader("Report by Problem Type")
+    category_counts=all_reports["issue_category"].value_counts()
+    st.bar_chart(category_counts)
+    st.subheader("Reports by Severity")
+    severity_counts = all_reports["severity"].value_counts()
+    st.bar_chart(severity_counts)
+    st.write("**Report Log Table**")
+    st.dataframe(all_reports, use_container_width=True)  
