@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os 
+from datetime import datetime
 from geopy.geocoders import Nominatim  
 
 geolocator = Nominatim(user_agent="road_repair_tracker")
@@ -27,12 +28,16 @@ if submit_button:
                 if geo_data:
                     latitude = geo_data.latitude
                     longitude = geo_data.longitude
+                    report_id=f"CRR-{datetime.now().strftime('%Y%m%d%H%M%S')}"
                     new_entry={
+                        report_id: [report_id],
                         "location": [location],
                         "years_broken": [years_broken],
                         "description": [description],
                         "latitude": [latitude],
-                        "longitude": [longitude]
+                        "longitude": [longitude],
+                        "date_reported": [datetime.now().strftime('%Y-%m-%d')],
+                        "status": ["Pending"]
                         }
                     new_df = pd.DataFrame(new_entry)
                     if not os.path.exists(CSV_FILE):
