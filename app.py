@@ -79,11 +79,38 @@ if submit_button:
 if os.path.isfile(CSV_FILE):
     st.subheader("Unresolved Reports Dashboard")
     all_reports = pd.read_csv(CSV_FILE)
-    total_reports = len(all_reports)
-    pending_reports=(all_reports['status']=="Pending").sum()
-    high_priority_reports=all_reports["severity"].isin(
+    st.subheader("Filter Reports")
+    selected_category = st.selectbox(
+        "Select Issue Category",
+        ["All"]+sorted(all_reports["issue_category"].unique().tolist())
+    )
+    selected_severity = st.selectbox(
+    "Select Severity",
+    ["All"] + sorted(all_reports["severity"].unique().tolist())
+)
+    if selected_category == "All" and selected_severity == "All":
+        filtered_reports = all_reports
+
+    elif selected_category == "All":
+        filtered_reports = all_reports[
+        all_reports["severity"] == selected_severity
+    ]
+
+    elif selected_severity == "All":
+        filtered_reports = all_reports[
+        all_reports["issue_category"] == selected_category
+    ]
+
+    else:
+        filtered_reports = all_reports[
+        (all_reports["issue_category"] == selected_category) &
+        (all_reports["severity"] == selected_severity)
+    ]
+    total_reports = len(filtered_reports)
+    pending_reports=(filtered_reports['status']=="Pending").sum()
+    high_priority_reports=filtered_reports["severity"].isin(
     ["High", "Critical"]).sum()
-    resolved_reports = (all_reports["status"] == "Resolved").sum()
+    resolved_reports = (filtered_reports["status"] == "Resolved").sum()
     st.subheader("Report Summary")
     col1, col2, col3, col4 = st.columns(4)
     
@@ -96,10 +123,10 @@ if os.path.isfile(CSV_FILE):
     with col4:
         st.metric("Resolved Reports", resolved_reports)
     st.subheader("Report by Problem Type")
-    category_counts=all_reports["issue_category"].value_counts()
+    category_counts=filtered_reports["issue_category"].value_counts()
     st.bar_chart(category_counts)
     st.subheader("Reports by Severity")
-    severity_counts = all_reports["severity"].value_counts()
+    severity_counts = filtered_reports["severity"].value_counts()
     st.bar_chart(severity_counts)
     st.write("**Report Log Table**")
-    st.dataframe(all_reports, use_container_width=True)  
+    st.dataframe(filtered_reports, use_container_width=True)  
